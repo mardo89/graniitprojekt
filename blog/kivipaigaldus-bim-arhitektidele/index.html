@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kivipaigalduse integreerimine BIM-i — arhitektidele |...</title>
+  <meta name="description" content="Building Information Modeling integratsioon: kivisillutise materjalide BIM-objektid, tehnilised parameetrid mudelis, koordineerimine teiste süsteemidega...">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://kivitööd24.ee/blog/kivipaigaldus-bim-arhitektidele/">
+
+  <meta property="og:title" content="Kivipaigalduse integreerimine BIM-i — arhitektidele">
+  <meta property="og:description" content="Building Information Modeling integratsioon: kivisillutise materjalide BIM-objektid, tehnilised parameetrid mudelis, koordineerimine teiste süsteemidega...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://kivitööd24.ee/blog/kivipaigaldus-bim-arhitektidele/">
+  <meta property="og:image" content="https://kivitööd24.ee/og-image.jpg">
+  <meta property="og:locale" content="et_EE">
+
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#faf8f4;--surface:#fff;--ink:#0c0a09;--ink-2:#3a3835;--muted:#78716c;
+      --accent:#b8860b;--accent-dark:#92710a;--accent-soft:#fef3c7;
+      --line:#e7e5e4;--border-strong:#d6d3d1;
+      --radius:6px;
+      --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+      --shadow-lg:0 12px 40px rgba(0,0,0,.10);
+    }
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background:var(--bg);color:var(--ink);line-height:1.6;font-size:16px;
+      -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    }
+    img{max-width:100%;height:auto;display:block}
+    a{color:var(--ink);text-decoration:none}
+    a:hover{color:var(--accent-dark)}
+    button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+    .wrap-narrow{max-width:880px;margin:0 auto;padding:0 24px}
+    section{padding:88px 0}
+    @media(min-width:900px){section{padding:120px 0}}
+
+    h1,h2,h3,h4{line-height:1.15;letter-spacing:-.025em;font-weight:700;color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+    h1{font-size:clamp(2.4rem,5.5vw,4.2rem);letter-spacing:-.035em}
+    h2{font-size:clamp(1.9rem,3.8vw,2.8rem);margin-bottom:.4em}
+    h3{font-size:1.35rem;margin-bottom:.4em;font-family:inherit}
+    p{color:var(--ink-2)}
+    .lead{font-size:1.18rem;color:var(--ink-2);max-width:680px;line-height:1.6}
+
+    /* Eyebrow */
+    .eyebrow{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--accent-dark);margin-bottom:14px;display:block}
+
+    /* Header */
+    .top{background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+    .top-inner{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;max-width:1200px;margin:0 auto;gap:20px}
+    .brand{display:flex;align-items:baseline;gap:4px}
+    .brand-logo{font-family:Georgia,serif;font-weight:700;font-size:1.25rem;color:var(--ink);letter-spacing:-.02em}
+    .brand-logo span{color:var(--accent-dark)}
+    .brand-tag{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.18em;font-weight:600}
+    @media(max-width:680px){.brand-tag{display:none}}
+    .nav-links{display:none;gap:28px;align-items:center;font-size:.92rem;font-weight:500}
+    .nav-links a{color:var(--ink-2);transition:color .15s}
+    .nav-links a:hover{color:var(--ink)}
+    @media(min-width:900px){.nav-links{display:flex}}
+    .top-cta{display:flex;align-items:center;gap:12px}
+    .top-phone{font-weight:600;color:var(--ink);font-size:.9rem;white-space:nowrap}
+    @media(max-width:560px){.top-phone{display:none}}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:var(--radius);font-weight:600;font-size:.95rem;transition:all .2s;text-decoration:none;min-height:50px;letter-spacing:.01em}
+    .btn-primary{background:var(--ink);color:#fff;border:1.5px solid var(--ink)}
+    .btn-primary:hover{background:#000;border-color:#000;color:#fff;text-decoration:none}
+    .btn-gold{background:var(--accent);color:#fff;border:1.5px solid var(--accent)}
+    .btn-gold:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff;text-decoration:none}
+    .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+    .btn-outline:hover{background:var(--ink);color:#fff;text-decoration:none}
+
+    /* Hero */
+    .hero{padding:80px 0 64px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%)}
+    @media(min-width:900px){.hero{padding:120px 0 96px}}
+    .hero-grid{display:grid;gap:60px;align-items:center}
+    @media(min-width:900px){.hero-grid{grid-template-columns:1.15fr .85fr;gap:80px}}
+    .hero h1{margin-bottom:28px}
+    .hero .lead{margin-bottom:36px}
+    .hero-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+    .hero-meta{margin-top:36px;padding-top:28px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    @media(min-width:600px){.hero-meta{grid-template-columns:repeat(4,1fr)}}
+    .hero-meta div{font-size:.85rem;color:var(--muted)}
+    .hero-meta strong{display:block;color:var(--ink);font-size:1.4rem;font-weight:700;font-family:Georgia,serif;margin-bottom:2px;letter-spacing:-.02em}
+
+    .hero-image{aspect-ratio:4/5;background-image:url('img/gallery-01.jpg');background-size:cover;background-position:center;border-radius:6px;box-shadow:var(--shadow-lg);position:relative}
+    .hero-image::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.2) 100%);border-radius:6px}
+
+    /* Stats strip */
+    .stats{background:var(--ink);color:#fff;padding:56px 0}
+    .stats-grid{display:grid;gap:40px;text-align:left}
+    @media(min-width:760px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+    .stat-num{font-family:Georgia,serif;font-size:3rem;font-weight:700;color:var(--accent);letter-spacing:-.04em;line-height:1;margin-bottom:8px}
+    .stat-lbl{font-size:.92rem;color:#a8a29e;line-height:1.5;max-width:200px}
+
+    /* Cases / portfolio */
+    .cases{background:var(--surface)}
+    .cases-grid{display:grid;gap:48px;margin-top:64px}
+    @media(min-width:900px){.cases-grid{grid-template-columns:repeat(2,1fr);gap:48px}}
+    .case{display:flex;flex-direction:column;gap:24px}
+    .case-image{aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:6px;box-shadow:var(--shadow)}
+    .case-meta{display:flex;gap:18px;font-size:.78rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+    .case h3{font-size:1.6rem;font-family:Georgia,serif}
+    .case-specs{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);font-size:.88rem}
+    .case-specs strong{display:block;color:var(--muted);font-weight:500;margin-bottom:2px;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase}
+    .case-specs span{color:var(--ink);font-weight:600}
+
+    /* Capabilities */
+    .caps{background:var(--bg)}
+    .caps-grid{display:grid;gap:32px;margin-top:56px}
+    @media(min-width:900px){.caps-grid{grid-template-columns:repeat(3,1fr)}}
+    .cap{padding:36px 32px;background:#fff;border:1px solid var(--line);border-radius:6px;transition:transform .2s,box-shadow .2s,border-color .2s}
+    .cap:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+    .cap-num{font-family:Georgia,serif;font-size:2.2rem;color:var(--accent);font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:18px}
+    .cap h3{font-size:1.2rem;font-family:Georgia,serif;margin-bottom:10px}
+    .cap p{font-size:.95rem;line-height:1.6}
+    .cap ul{list-style:none;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+    .cap ul li{font-size:.85rem;color:var(--ink-2);padding:5px 0 5px 16px;position:relative}
+    .cap ul li::before{content:"·";position:absolute;left:0;color:var(--accent);font-weight:900}
+
+    /* Process */
+    .process{background:var(--surface)}
+    .process-grid{display:grid;gap:0;margin-top:56px;border-top:1px solid var(--line)}
+    .pstep{display:grid;grid-template-columns:60px 1fr;gap:32px;padding:36px 0;border-bottom:1px solid var(--line)}
+    @media(min-width:760px){.pstep{grid-template-columns:80px 1fr 1fr;gap:48px}}
+    .pstep-num{font-family:Georgia,serif;font-size:2rem;color:var(--accent);font-weight:700;letter-spacing:-.03em}
+    .pstep h3{font-family:Georgia,serif;font-size:1.3rem;margin-bottom:8px}
+    .pstep p{font-size:.95rem}
+    .pstep-time{font-size:.78rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-top:8px}
+
+    /* Form section */
+    .inquiry{background:var(--ink);color:#fff;padding:96px 0}
+    .inquiry h2{color:#fff}
+    .inquiry .eyebrow{color:var(--accent)}
+    .inquiry .lead{color:#d6d3d1;margin-bottom:48px}
+    .inquiry-grid{display:grid;gap:48px;margin-top:48px}
+    @media(min-width:900px){.inquiry-grid{grid-template-columns:1fr 1fr;gap:80px}}
+    .inquiry-info p{color:#a8a29e;font-size:.95rem;margin-bottom:18px}
+    .inquiry-info dl{margin-top:24px}
+    .inquiry-info dt{color:var(--accent);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-top:14px;margin-bottom:4px}
+    .inquiry-info dd{color:#fff;font-size:1.05rem;font-family:Georgia,serif}
+
+    .inquiry-form{background:#fff;color:var(--ink);padding:36px;border-radius:6px}
+    .inquiry-form h3{margin-bottom:6px}
+    .inquiry-form .sub{color:var(--muted);font-size:.92rem;margin-bottom:24px}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-weight:600;font-size:.82rem;color:var(--ink);margin-bottom:5px;letter-spacing:.02em}
+    .field input,.field select,.field textarea{
+      width:100%;padding:12px 14px;border:1px solid var(--border-strong);border-radius:4px;font:inherit;font-size:.95rem;
+      background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{
+      outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);
+    }
+    .field-row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+    .inquiry-form .btn{width:100%;margin-top:12px}
+    .form-foot{margin-top:14px;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.5}
+
+    /* Gallery */
+    .gallery{background:var(--bg)}
+    .gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:48px}
+    @media(min-width:760px){.gallery-grid{grid-template-columns:repeat(3,1fr);gap:18px}}
+    .gallery-grid img{aspect-ratio:4/5;width:100%;object-fit:cover;border-radius:4px;display:block;transition:opacity .3s}
+    .gallery-grid img:hover{opacity:.85}
+
+    /* References */
+    .refs{background:var(--surface);padding:64px 0;border-block:1px solid var(--line)}
+    .refs-grid{display:grid;gap:36px;align-items:center;margin-top:32px;grid-template-columns:repeat(2,1fr)}
+    @media(min-width:760px){.refs-grid{grid-template-columns:repeat(4,1fr);gap:56px}}
+    .ref{font-family:Georgia,serif;font-style:italic;color:var(--muted);font-size:1.05rem;text-align:center;letter-spacing:-.02em}
+
+    /* FAQ */
+    .faq{margin-top:48px}
+    .faq details{background:#fff;border:1px solid var(--line);border-radius:4px;padding:0;margin-bottom:8px;overflow:hidden;transition:border-color .15s}
+    .faq details[open]{border-color:var(--accent)}
+    .faq summary{padding:20px 24px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:18px;color:var(--ink);font-family:Georgia,serif;font-size:1.05rem}
+    .faq summary::-webkit-details-marker{display:none}
+    .faq summary::after{content:"+";font-size:1.4rem;color:var(--accent);transition:transform .15s;flex:none;font-family:inherit}
+    .faq details[open] summary::after{transform:rotate(45deg)}
+    .faq details p{padding:0 24px 22px;color:var(--ink-2);font-size:.97rem;line-height:1.7}
+
+    /* Footer */
+    footer{background:var(--ink);color:#a8a29e;padding:80px 0 36px;font-size:.92rem}
+    .foot-top{display:grid;gap:48px;margin-bottom:64px}
+    @media(min-width:760px){.foot-top{grid-template-columns:1.5fr 1fr 1fr 1fr}}
+    .foot-top h4{color:#fff;margin-bottom:16px;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;font-family:inherit}
+    .foot-top a{color:#d6d3d1;display:block;padding:4px 0;font-size:.92rem}
+    .foot-top a:hover{color:var(--accent)}
+    .foot-brand-name{font-family:Georgia,serif;font-size:1.4rem;color:#fff;margin-bottom:14px}
+    .foot-brand-name span{color:var(--accent)}
+    .foot-bottom{border-top:1px solid #292524;padding-top:24px;text-align:center;font-size:.82rem;color:#78716c}
+    /* a11y: visible focus ring for keyboard users — WCAG 2.1 AA */
+    a:focus-visible,button:focus-visible,summary:focus-visible,.btn:focus-visible{outline:3px solid #b8860b;outline-offset:2px;border-radius:6px}
+    /* responsive tables — horizontal scroll on narrow viewports */
+    .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5em 0}
+    .table-scroll table{margin:0;min-width:560px}
+    @media(max-width:560px){article table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;min-width:0}}
+    /* very narrow screens — keep sticky CTAs compact */
+    @media(max-width:380px){.sticky-bar .btn{font-size:.86rem;padding:11px 8px;min-height:46px}.top-cta>.btn{padding:8px 12px;font-size:.85rem}}
+
+
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <a href="/" class="brand">
+      <span class="brand-logo">Kivitööd<span>24</span></span>
+      <span class="brand-tag">Kivitööd · projekteerimine · paigaldus</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#tood">Tööd</a>
+      <a href="#voimalused">Võimalused</a>
+      <a href="#protsess">Protsess</a>
+      <a href="#paring">Päring</a>
+    </nav>
+    <div class="top-cta">
+      <a href="tel:+37258374422" class="top-phone">+372 58374422</a>
+      <a href="#paring" class="btn btn-gold" style="padding:11px 18px;min-height:auto;font-size:.88rem">Esita projekt</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="breadcrumbs" style="font-size:.85rem;color:#737373;margin-bottom:18px;padding-top:12px"><a href="/">Avaleht</a> &rsaquo; <a href="/blog/">Blog</a> &rsaquo; Kivipaigalduse integreerimine BIM-i — arhitektidele</nav>
+</div>
+
+<article style="max-width:780px;margin:0 auto;padding:0 20px">
+  <div class="article-meta">
+  <nav aria-label="Breadcrumb">
+    <a href="/">Avaleht</a> › <a href="/blog/">Blog</a> › <span>Kivipaigalduse integreerimine BIM-i</span>
+  </nav>
+  <p class="meta-line">
+    <span>Autor: Keio Soo</span> · <span>Avaldatud: 16. mai 2026</span> · <span>Lugemisaeg: ~9 min</span>
+  </p>
+</div>
+
+<h1>Kivipaigalduse integreerimine BIM-i — arhitektidele</h1>
+
+<p class="lead">BIM (Building Information Modeling) on muutunud Eesti suurprojektide standardiks ning välisruum ei tohi enam mudelist puududa. Kivisillutis, äärekivi, drenaažikate ja valgustustaskute koordinaadid peavad jõudma samasse mudelisse, kus on hoone ja insenervõrgud — vastasel juhul kasvavad muudatuskulud objektil tellija jaoks 15–25%.</p>
+
+<div class="answer-card">
+  <strong>Lühivastus:</strong> Kivisillutise BIM-integratsioon nõuab kolme kihti — geomeetria (LOD 300–400), materjali atribuudid (tihedus, <a href="/blog/kivipaigalduse-standardid-eestis/">EVS-EN 1338</a>/1342, värvikood) ja koordineerimist MEP-süsteemidega (drenaaž 1,5–3 % kalle, kaablitrassid). Põhitarkvarad on <strong>Autodesk Revit</strong> (Site Designer, Civil 3D linkimine) ja <strong>Graphisoft ArchiCAD</strong> (Surface Tools + IFC eksport). Kivitööd 24 tarnib objektide IFC- ja RFA-failid arhitektile tasuta projektidel kuni 2 500 m² (maht kuni 200 000 €).
+</div>
+
+<h2>Miks kivisillutis kuulub BIM-mudelisse?</h2>
+
+<p>Esimene reaalsus: kui kivisillutis on mudelis ainult "pinnakate"-kihina ilma materjali atribuutideta, kaotab arhitekt kontrolli koguste, hangete ja koordineerimise üle. BIM-i kaasamine annab kolm konkreetset eelist:</p>
+
+<ul>
+  <li><strong>Kogused automaatselt</strong> — m² ja jooksumeetrid uuenevad mudeli muutudes, hinnaerinevus konkursil väheneb ±3 %-le.</li>
+  <li><strong>Kollisiooni avastamine</strong> — Navisworks või Solibri leiab konfliktid äärekivi ja sadeveekaevu vahel projekteerimisfaasis, mitte objektil.</li>
+  <li><strong>Tellijale dokumentatsioon</strong> — IFC-mudel sisaldab materjalide elukaareandmeid (eluiga 30–50 aastat looduskivile, 20–30 aastat betoonkivile EVS-EN 1338 järgi).</li>
+</ul>
+
+<p>Vaata ka <a href="/blog/graniit-vs-betoonkivi-arhitektidele/">graniidi ja betoonkivi võrdlust arhitektidele</a>, kus on BIM-spetsifikatsioonidesse sobivad materjaliandmed.</p>
+
+<h2>Kivisillutise BIM-objektid: Revit vs ArchiCAD</h2>
+
+<p>Eesti suurprojektidel domineerivad kaks platvormi. Revit on tavalisem inseneribüroodes ja taristuprojektides, ArchiCAD arhitektuuribüroodes. Mõlemasse on võimalik kivisillutist täpselt modelleerida, kuid tööriistad erinevad oluliselt.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Funktsioon</th>
+      <th>Autodesk Revit</th>
+      <th>Graphisoft ArchiCAD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sillutise modelleerimine</td>
+      <td>Floor / Toposolid + Pattern</td>
+      <td>Mesh + Surface Painter</td>
+    </tr>
+    <tr>
+      <td>Mustri täpsus (LOD 350)</td>
+      <td>Adaptive Components</td>
+      <td>Morph + custom Library Parts</td>
+    </tr>
+    <tr>
+      <td>Äärekivi (EVS-EN 1340)</td>
+      <td>Sweep / Railing profile</td>
+      <td>Profile Manager + Beam</td>
+    </tr>
+    <tr>
+      <td>Kaldepind (drenaaž)</td>
+      <td>Toposolid Subdivide</td>
+      <td>Mesh ridge edit</td>
+    </tr>
+    <tr>
+      <td>IFC-eksport kvaliteet</td>
+      <td>Hea (IFC 2x3, 4)</td>
+      <td>Väga hea (natiivne)</td>
+    </tr>
+    <tr>
+      <td>Koguste tabel</td>
+      <td>Schedule / Material Takeoff</td>
+      <td>Interactive Schedule</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Praktikas töötame Balcon Grupp OÜ-s mõlema platvormiga. Kui projekteerija saadab Revit-mudeli, anname tagasi RFA-failid (Brikers, Aroc, Premia betoonkivisarjad ning graniidi standardprofiilid). ArchiCAD-i kasutajatele eksporditakse GDL-objektid ja IFC.</p>
+
+<h2>Tehnilised parameetrid kivipaigalduse BIM-mudelis</h2>
+
+<p>Kivisillutise BIM-objekt on kasutu ilma parameetriteta. Iga element peab sisaldama vähemalt järgnevat atribuutide kogumit, mille saab eksportida IFC PropertySet-i:</p>
+
+<ul>
+  <li><strong>Mõõtmed</strong> — pikkus × laius × kõrgus mm (näiteks graniit 100×100×60 mm).</li>
+  <li><strong>Standard</strong> — EVS-EN 1338 (betoonkivi), <a href="/blog/kivipaigalduse-standardid-eestis/">EVS-EN 1342</a> (looduskivi), EVS-EN 1340 (äärekivi).</li>
+  <li><strong>Tihedus</strong> — graniit 2 600–2 800 kg/m³, betoonkivi 2 200–2 400 kg/m³.</li>
+  <li><strong>Külmakindlus</strong> — F2 (looduskivi) või klass D (betoonkivi).</li>
+  <li><strong>Libisemiskindlus</strong> — USRV ≥ 60 avalikele platsidele.</li>
+  <li><strong>Värvikood</strong> — NCS või RAL, päritolu (Soome/Hiina/India/Skandinaavia graniit).</li>
+  <li><strong>Paigalduskiht</strong> — killustikalus 30 mm, alus 150–300 mm sõltuvalt liikluskoormusest.</li>
+</ul>
+
+<p>Vaata ka <a href="/blog/kivipaigalduse-standardid-eestis/">kivipaigalduse standardite ülevaadet</a> ja <a href="/graniidist-tanavakivi/">graniidist tänavakivi spetsifikatsioone</a>.</p>
+
+<div class="cta-strip">
+  <div>
+    <strong>Vajad BIM-valmis kivisillutise objekte?</strong> Saadame RFA, IFC ja GDL failid 48 tunni jooksul — tasuta projektide jaoks mahuga kuni 2 500 m².
+  </div>
+  <div>
+    <a href="tel:+37258374422" class="btn btn-primary">📞 +372 58374422</a>
+    <a href="/#kontakt-top" class="btn btn-ghost">Saada päring</a>
+  </div>
+</div>
+
+<h2>Koordineerimine MEP- ja taristusüsteemidega</h2>
+
+<p>Kivisillutise tegelik BIM-väärtus tuleb välja koordineerimisel. Tüüpilised konfliktipunktid, mis avastatakse Navisworks Clash Detective'is või Solibri Office'is:</p>
+
+<h3>Drenaaž ja sadeveesüsteem</h3>
+<p>Kalde 1,5–3 % peab voolama restkaevuni. BIM-mudelis tähendab see, et iga restkaevu (Wavin, Aco) GeometryRepresentation peab kohanduma sillutise pinnatasandiga. ArchiCAD-is kasutatakse selleks Mesh-objekti ridge-jooni, Revit-is Toposolid Sub-elemente.</p>
+
+<h3>Tänavavalgustus ja kaabeltrassid</h3>
+<p>Mast-vundamendid (tüüpiliselt 600×600×800 mm betoonkubikud) tekitavad sillutisesse tagasivõtte. Valgustusprojekteerija pärsib tihti seda kihti, mistõttu kivipaigaldaja avastab vundamendi alles objektil. BIM-mudelis peavad kõik mastid olema märgitud LOD 300 tasemel enne kivipakettide tellimist.</p>
+
+<h3>Soojustrassid ja küttekaablid</h3>
+<p>Lumetõrjega platside puhul (näiteks <a href="/kivilahendus-avalikud-platsid/">avalike platside kivilahendustes</a>) tuleb küttekaabel arvestada paigalduskihti enne sillutist. BIM-mudelis on kaabel tüüpiliselt 35 mm allpool sillutise alumist serva — kui see ei kajastu, tõuseb sillutise kõrgus objektil 4–5 cm võrra.</p>
+
+<h2>LOD-tasemed kivisillutise puhul</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>LOD</th>
+      <th>Sisu</th>
+      <th>Kasutus etapis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>LOD 200</td>
+      <td>Üldine pind, kihi paksus</td>
+      <td>Eskiis, kontseptsioon</td>
+    </tr>
+    <tr>
+      <td>LOD 300</td>
+      <td>Mustri suund, äärekivi joon, kalded</td>
+      <td>Põhiprojekt</td>
+    </tr>
+    <tr>
+      <td>LOD 350</td>
+      <td>Üksikkivid, mustri kordusjoon</td>
+      <td>Tööjoonised, hange</td>
+    </tr>
+    <tr>
+      <td>LOD 400</td>
+      <td>Tegelik koguste täpsus, paigaldusjärjestus</td>
+      <td>Tootmine, paigaldus</td>
+    </tr>
+    <tr>
+      <td>LOD 500</td>
+      <td>As-built, tegelik geomeetria</td>
+      <td>Hooldus, garantii (2 a)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Riigihankel nõutakse tüüpiliselt LOD 300, kuid kvaliteetne <a href="/blog/riigihangete-protseduurid-kivipaigaldusel/">riigihanke ettevalmistus kivipaigaldusel</a> eeldab LOD 350 koguste täpsuse pärast.</p>
+
+<h2>Tüüpilised vead BIM-mudelites — ja kuidas neid vältida</h2>
+
+<div class="warning">
+  <strong>⚠ Sage viga:</strong> arhitekt määrab sillutise värvi visualiseeringule sobivalt (näiteks helehall graniit), kuid päritolu (Soome vs Hiina vs India) jääb määramata. <a href="/blog/graniit-tarne-soome-vs-hiina/">Graniidi tarne erinevus Soome ja Hiina vahel</a> mõjutab tarneaega 4–12 nädalat ning hinda 25–40 %.
+</div>
+
+<p>Teised korduvad probleemid:</p>
+
+<ul>
+  <li><strong>Materjali atribuudid kopeeritud teisest mudelist</strong> — tihti kaasneb vale standard (EN 1339 asemel EVS-EN 1338).</li>
+  <li><strong>Äärekivi kõrgus ei vasta sillutise paksusele</strong> — 60 mm sillutis vajab 100×200×800 mm äärekivi, mitte 80×150×800.</li>
+  <li><strong>Muinsuskaitsealal vale kivisarja kasutamine</strong> — vaata <a href="/blog/muinsuskaitse-kivitood-protseduurid/">muinsuskaitse kivitööde protseduure</a>.</li>
+  <li><strong>IFC eksport ilma PropertySet'ita</strong> — ehitajale läheb mudel, kus puudub liikluskoormuse klass ja külmakindlus.</li>
+</ul>
+
+<h2>Töövoog: arhitekt ↔ kivipaigaldaja</h2>
+
+<p>Toimiv koostöö Balcon Grupp OÜ-ga (asutatud 2021) järgib viie etapi mudelit:</p>
+
+<ol>
+  <li><strong>Eskiis (LOD 200)</strong> — arhitekt saadab pinnaviite ja kasutusotstarbe, meie pakume materjalivalikut ja indikatiivset hinda (€/m²).</li>
+  <li><strong>Põhiprojekt (LOD 300)</strong> — anname RFA/GDL/IFC objektid mudelisse lisamiseks.</li>
+  <li><strong>Tööjoonised (LOD 350)</strong> — kontrollime kollisioone Navisworks Freedom'is ja saadame tagasiside 5 tööpäeva jooksul.</li>
+  <li><strong>Tootmine ja paigaldus</strong> — kasutame sama mudelit objektil iPad'is (BIM 360 või BIMx).</li>
+  <li><strong>As-built (LOD 500)</strong> — pärast paigaldust uuendame mudeli ja anname tellijale üle koos 2-aastase garantiiga.</li>
+</ol>
+
+<p>Ärihoonete puhul vaata ka <a href="/kivilahendus-aripindadele/">kivilahenduste pakkumist äripindadele</a>.</p>
+
+<div class="cta-strip">
+  <div>
+    <strong>Plaanid BIM-projekti äripinnale, avalikule platsile või arendusele?</strong> Konsultatsioon arhitektile on tasuta — räägime materjali, LOD-i ja hindadest enne, kui mudelisse läheb.
+  </div>
+  <div>
+    <a href="tel:+37258374422" class="btn btn-primary">📞 +372 58374422</a>
+    <a href="/#kontakt-top" class="btn btn-ghost">Saada päring</a>
+  </div>
+</div>
+
+<h2 id="kkk">Korduma kippuvad küsimused</h2>
+
+<div class="faq">
+  <details>
+    <summary>Millises formaadis saadate BIM-objektid?</summary>
+    <p>Anname RFA (Revit), GDL ja LCF (ArchiCAD) ning IFC 2x3 ja IFC 4 failid. Iga objekt sisaldab vähemalt 12 PropertySet parameetrit: mõõtmed, EVS-EN standard, tihedus, külmakindlus (F2), libisemiskindlus (USRV), värvikood, päritolu ning paigalduskihi paksus.</p>
+  </details>
+  <details>
+    <summary>Kas BIM-tugi on tasuline?</summary>
+    <p>Projektidel kuni 2 500 m² (kogumaht kuni 200 000 €) on BIM-objektide tarne ja üks kollisioonikontrolli vooru tasuta. Suurematel ja keerukamatel projektidel kokkuleppel eraldi.</p>
+  </details>
+  <details>
+    <summary>Millise LOD-tasemega töötate?</summary>
+    <p>Standardpakkumine on LOD 300, tööjoonisteks pakume LOD 350 (mustri üksikkivid ja äärekivi profiil). LOD 400 (tegelik koguste täpsus ja paigaldusjärjestus) tehakse projektidel alates 500 m².</p>
+  </details>
+  <details>
+    <summary>Kas saate koordineerida valgustuse ja drenaažiga?</summary>
+    <p>Jah. Teeme Navisworks Freedom'is või Solibri Anywhere's kollisioonikontrolli teie projekteerija mudeliga. Drenaažikalle 1,5–3 % ja küttekaabli paigutus paigalduskihis on standardsed kontrollpunktid.</p>
+  </details>
+  <details>
+    <summary>Kui kiiresti saame BIM-objektid pärast päringut?</summary>
+    <p>Standardsed Brikers/Aroc/Premia betoonkivisarjade ning Soome ja Hiina graniidi sarjade objektid 48 tunni jooksul. Kohandatud profiilid (näiteks erivärvi graniidi sageti) 5–10 tööpäeva jooksul.</p>
+  </details>
+</div>
+
+<h2>Seotud artiklid</h2>
+
+<div class="related-grid">
+  <ul>
+    <li><a href="/blog/graniit-vs-betoonkivi-arhitektidele/">Graniit vs betoonkivi — arhitektidele</a></li>
+    <li><a href="/blog/kivipaigalduse-standardid-eestis/">Kivipaigalduse standardid Eestis</a></li>
+    <li><a href="/blog/riigihangete-protseduurid-kivipaigaldusel/">Riigihangete protseduurid kivipaigaldusel</a></li>
+    <li><a href="/blog/muinsuskaitse-kivitood-protseduurid/">Muinsuskaitse kivitööde protseduurid</a></li>
+    <li><a href="/blog/graniit-tarne-soome-vs-hiina/">Graniidi tarne — Soome vs Hiina</a></li>
+    <li><a href="/blog/">Kõik blogiartiklid</a></li>
+  </ul>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "headline": "Kivipaigalduse integreerimine BIM-i — arhitektidele",
+      "datePublished": "2026-05-16",
+      "dateModified": "2026-05-16",
+      "author": {
+        "@type": "Person",
+        "name": "Keio Soo",
+        "jobTitle": "Tegevjuht",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Balcon Grupp OÜ"
+        }
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Balcon Grupp OÜ",
+        "url": "https://kivitööd24.ee/"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://kivitööd24.ee/blog/kivipaigaldus-bim-arhitektidele/"
+      },
+      "keywords": "BIM kivipaigaldus, Revit kivisillutis, ArchiCAD sillutis, IFC kivisillutis, LOD kivipaigaldus"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Millises formaadis saadate BIM-objektid?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Anname RFA (Revit), GDL ja LCF (ArchiCAD) ning IFC 2x3 ja IFC 4 failid. Iga objekt sisaldab vähemalt 12 PropertySet parameetrit: mõõtmed, EVS-EN standard, tihedus, külmakindlus (F2), libisemiskindlus (USRV), värvikood, päritolu ning paigalduskihi paksus."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kas BIM-tugi on tasuline?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Projektidel kuni 2 500 m² (kogumaht kuni 200 000 €) on BIM-objektide tarne ja üks kollisioonikontrolli vooru tasuta. Suurematel ja keerukamatel projektidel kokkuleppel eraldi."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Millise LOD-tasemega töötate?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Standardpakkumine on LOD 300, tööjoonisteks LOD 350 (mustri üksikkivid ja äärekivi profiil). LOD 400 tehakse projektidel alates 500 m²."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kas saate koordineerida valgustuse ja drenaažiga?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Jah. Teeme Navisworks Freedom'is või Solibri Anywhere's kollisioonikontrolli teie projekteerija mudeliga. Drenaažikalle 1,5–3 % ja küttekaabli paigutus paigalduskihis on standardsed kontrollpunktid."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kui kiiresti saame BIM-objektid pärast päringut?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Standardsed Brikers/Aroc/Premia betoonkivisarjade ning Soome ja Hiina graniidi sarjade objektid 48 tunni jooksul. Kohandatud profiilid 5–10 tööpäeva jooksul."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Avaleht",
+          "item": "https://kivitööd24.ee/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://kivitööd24.ee/blog/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Kivipaigalduse integreerimine BIM-i — arhitektidele",
+          "item": "https://kivitööd24.ee/blog/kivipaigaldus-bim-arhitektidele/"
+        }
+      ]
+    }
+  ]
+}
+</script>
+</article>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <div class="foot-brand-name">Kivitööd<span>24</span></div>
+        <p style="color:#a8a29e;max-width:340px">Suuremahuliste <a href="/graniidist-tanavakivi/">graniidist tänavakivi</a> paigalduse projektid äripindadele, avalikele platsidele ja arhitektuurselt nõudlikele eramutele. Projekteerimine, materjalide tarne ja teostus ühest käest.</p>
+        <p style="margin-top:18px"><strong style="color:#fff">+372 58374422</strong><br>projekt@graniitprojekt.com<br>Tegevjuht: Keio Soo</p>
+      </div>
+      <div>
+        <h4>Võimalused</h4>
+        <a href="#voimalused">Projekteerimine</a>
+        <a href="#voimalused">Materjali tarne</a>
+        <a href="#voimalused">Paigaldus</a>
+        <a href="#voimalused">Hooldus</a>
+      </div>
+      <div>
+        <h4>Tüübid</h4>
+        <a href="#tood">Avalikud platsid</a>
+        <a href="#tood">Äripinnad</a>
+        <a href="#tood">Premium eramud</a>
+        <a href="#tood">Riigihanked</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="#paring">Esita projekt</a>
+        <a href="#protsess">Protsess</a>
+        <a href="#">Privaatsuspoliitika</a>
+        <a href="#">Üldtingimused</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 Kivitööd 24 · Operator: Balcon Grupp OÜ · Reg nr 16294742 · Asutatud 18.08.2021 · Asutatud 18.08.2021</div>
+  </div>
+</footer>
+
+
+
+</body>
+</html>
